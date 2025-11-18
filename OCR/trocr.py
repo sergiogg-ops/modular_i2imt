@@ -1,6 +1,8 @@
 from doctr.io import DocumentFile
 from doctr.models import ocr_predictor
 from argparse import ArgumentParser
+from os.path import basename
+import os
 import yaml
 
 def parse_args():
@@ -42,10 +44,9 @@ def main():
         texts, bboxes = forward(predictor, document)
         combined_text = ' '.join([' '.join(block) for block in texts])
         combined_bboxes = [bbox for block in bboxes for bbox in block]
-        results.append({
-            "image_path": image_path.split('/')[-1],
+        results[basename(image_path)] = {
             "text": combined_text,
             "bbox": combined_bboxes
-        })
+        }
     with open(args.output, "w") as f:
         yaml.dump(results, f)

@@ -225,13 +225,13 @@ def main():
     if not src_texts or not tgt_texts:
         raise ValueError("Source or target text files are empty.")
     
-    src_reader = easyocr.Reader([args.src_lang],gpu=False)
-    tgt_reader = easyocr.Reader([args.tgt_lang],gpu=False)
+    src_reader = easyocr.Reader([args.src_lang],gpu=True)
+    tgt_reader = easyocr.Reader([args.tgt_lang],gpu=True)
     
     print("Starting dataset generation...")
     print(f"Images will be saved to {args.output}_{args.src_lang} and {args.output}_{args.tgt_lang}")
     count = 0
-    src_meta, tgt_meta = [], []
+    src_meta, tgt_meta = {}, {}
     progress = tqdm(total=args.num_images, desc="Generating", unit="pair")
     while count < args.num_images:
         src_image, tgt_image, src_text, tgt_text, src_bboxes, tgt_bboxes = generate_pair(
@@ -247,16 +247,14 @@ def main():
             tgt_image.save(os.path.join(f'{args.output}_{args.tgt_lang}', f'{count}.png'))
 
             # Save metadata
-            src_meta.append({
-                'image': f'{count}.png',
+            src_meta[f'{count}.jpg'] = {
                 'text': src_text,
                 'bboxes': [bbox.tolist() for bbox in src_bboxes]
-            })
-            tgt_meta.append({
-                'image': f'{count}.png',
+            }
+            tgt_meta[f'{count}.jpg'] = {
                 'text': tgt_text,
                 'bboxes': [bbox.tolist() for bbox in tgt_bboxes]
-            })
+            }
 
             count += 1
             progress.update(1)

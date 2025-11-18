@@ -45,10 +45,10 @@ def main():
                                       use_safetensors=True)
     model = model.eval().cuda().to(torch.bfloat16)
 
-    results = []
+    results = {}
     for image_path in args.paths:
         texts, bboxes = forward(model, tokenizer, image_path, args.output)
-        results.append({"image_path": image_path, "texts": texts, "bboxes": bboxes})
+        results[os.basename(image_path)] = {"text": texts, "bboxes": bboxes}
     
     with open(args.output, 'w') as f:
         yaml.dump(results, f)

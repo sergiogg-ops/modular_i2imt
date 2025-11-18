@@ -1,9 +1,9 @@
 images: "images/"
-src_text: "/data/open_subtitles/OpenSubtitles.de-en.en"
+src_text: "/home/sgomgon/modular_i2imt/data/OpenSubtitles.de-en.en"
 src_lang: "en"
-tgt_text: "/data/open_subtitles/OpenSubtitles.de-en.de"
+tgt_text: "/home/sgomgon/modular_i2imt/data/OpenSubtitles.de-en.de"
 tgt_lang: "de"
-output: "/data/i2i/horizontal_mix/"
+output: "/home/sgomgon/modular_i2imt/data/horizontal_mix"
 font_path: 
     - "font/OpenSans/static/OpenSans-Bold.ttf"
     - "font/OpenSans/static/OpenSans-BoldItalic.ttf"
@@ -16,7 +16,7 @@ font_path:
     - "font/OpenSans/static/OpenSans-Regular.ttf"
     - "font/OpenSans/static/OpenSans-SemiBold.ttf"
     - "font/OpenSans/static/OpenSans-SemiBoldItalic.ttf"
-    - "font/Arial/arial.ttf"
+    - "font/Arial/Arial_Unicode.ttf"
 min_font_height: 15
 max_font_height: 50
 min_slope: 0

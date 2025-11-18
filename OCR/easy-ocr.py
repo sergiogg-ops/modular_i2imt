@@ -25,15 +25,14 @@ def main():
     args = parse_args()
     reader = easyocr.Reader([args.lang], gpu=False)
 
-    results = []
+    results = {}
     for image_path in args.paths:
         image = read_image(image_path)
         text = forward(reader, image)
-        results.append({
-            "image_path": basename(image_path),
+        results[basename(image_path)] = {
             "text": text[1],
             "bbox": text[0]
-        })
+        }
     with open(args.output, "w") as f:
         yaml.dump(results, f)
 
