@@ -1,0 +1,26 @@
+images: "images/"
+src_text: "/data/open_subtitles/OpenSubtitles.de-en.en"
+src_lang: "en"
+tgt_text: "/data/open_subtitles/OpenSubtitles.de-en.de"
+tgt_lang: "de"
+output: "/data/i2i/horizontal_mix/"
+font_path: 
+    - "font/OpenSans/static/OpenSans-Bold.ttf"
+    - "font/OpenSans/static/OpenSans-BoldItalic.ttf"
+    - "font/OpenSans/static/OpenSans-ExtraBold.ttf"
+    - "font/OpenSans/static/OpenSans-Italic.ttf"
+    - "font/OpenSans/static/OpenSans-Light.ttf"
+    - "font/OpenSans/static/OpenSans-LightItalic.ttf"
+    - "font/OpenSans/static/OpenSans-Medium.ttf"
+    - "font/OpenSans/static/OpenSans-MediumItalic.ttf"
+    - "font/OpenSans/static/OpenSans-Regular.ttf"
+    - "font/OpenSans/static/OpenSans-SemiBold.ttf"
+    - "font/OpenSans/static/OpenSans-SemiBoldItalic.ttf"
+    - "font/Arial/arial.ttf"
+min_font_height: 15
+max_font_height: 50
+min_slope: 0
+max_slope: 0
+min_width: 128
+num_images: 3000
+seed: 42
