@@ -25,7 +25,7 @@ def main():
     translation_pipeline = TranslationPipeline(model=model, tokenizer=tokenizer, batch_size=args.batch_size, num_workers=2, device='cuda')
 
     identifiers = list(data.keys())
-    source_sentences = [data[id]['text'] for id in identifiers]
+    source_sentences = ['\n'.join(data[id]['text']) for id in identifiers]
     translations = translation_pipeline(source_sentences, 
                                           max_length=512, 
                                           num_beams=4, 
@@ -34,7 +34,7 @@ def main():
                                           tgt_lang=args.tgt_lang)
 
     for id, translation in zip(identifiers, translations):
-        data[id]['translation'] = translation
+        data[id]['translation'] = translation.split('\n')
 
     with open(args.output, 'w', encoding='utf-8') as f:
         yaml.dump(data, f, allow_unicode=True)

@@ -68,7 +68,7 @@ class Std_Text(object):
 
         # Calculate the size needed for the text before rotation
         draw = ImageDraw.Draw(Image.new('RGB', (1, 1))) # dummy draw object
-        wrapped_text, widths = self.wrap_text_pillow(draw, text, max_width)
+        wrapped_text, widths, lines = self.wrap_text_pillow(draw, text, max_width)
         text_bbox = draw.multiline_textbbox((0, 0), wrapped_text, font=self.font)
         text_width = text_bbox[2]
         text_height = text_bbox[3]
@@ -103,11 +103,12 @@ class Std_Text(object):
         # Translate back
         bboxes = [bbox + np.array([x1, y1]) for bbox in bbox_rotated]
 
-        return image, bboxes
+        return image, bboxes, lines
 
     def wrap_text_pillow(self, draw, text, max_width):
         # Your existing text wrapping logic
         words = text.split()
+        splitted_text = []
         lines = []
         widths = []
         cur = ""
@@ -121,12 +122,14 @@ class Std_Text(object):
                 if cur:
                     lines.append(cur)
                     widths.append(draw.textlength(cur, font=self.font))
+                    splitted_text.append(cur)
                 cur = w
         if cur:
             lines.append(cur)
             widths.append(draw.textlength(cur, font=self.font))
+            splitted_text.append(cur)
         lines = '\n'.join(lines)
-        return lines, widths
+        return lines, widths, splitted_text
 
 def generate_pair(images, src_texts, tgt_texts, fonts, min_height, max_height, min_slope, max_slope, min_width):
     '''
@@ -167,9 +170,9 @@ def generate_pair(images, src_texts, tgt_texts, fonts, min_height, max_height, m
 
     # Draw images
     drawer = Std_Text(font, height)
-    src_image, src_bboxes = drawer.draw_text(src_text, bg_image.copy(), bbox, slope)
-    tgt_image, tgt_bboxes = drawer.draw_text(tgt_text, bg_image.copy(), bbox, slope)
-    return src_image, tgt_image, src_text, tgt_text, src_bboxes, tgt_bboxes
+    src_image, src_bboxes, src_lines = drawer.draw_text(src_text, bg_image.copy(), bbox, slope)
+    tgt_image, tgt_bboxes, tgt_lines = drawer.draw_text(tgt_text, bg_image.copy(), bbox, slope)
+    return src_image, tgt_image, src_lines, tgt_lines, src_bboxes, tgt_bboxes
 
 def verify(reader, img, text, threshold):
     '''
@@ -185,6 +188,7 @@ def verify(reader, img, text, threshold):
     Returns:
         bool: True if the text is correctly drawn, False otherwise.
     '''
+    text = " ".join(text)
     hyp = reader.readtext(np.array(img), paragraph=True)
     hyp = " ".join([x[1] for x in hyp])
     score = wer(hyp, text)
@@ -243,8 +247,8 @@ def main():
         if verify(src_reader, src_image, src_text, args.curation_threshold) and \
            verify(tgt_reader, tgt_image, tgt_text, args.curation_threshold):
             # Save images
-            src_image.save(os.path.join(f'{args.output}_{args.src_lang}', f'{count}.png'))
-            tgt_image.save(os.path.join(f'{args.output}_{args.tgt_lang}', f'{count}.png'))
+            src_image.save(os.path.join(f'{args.output}_{args.src_lang}', f'{count}.jpg'))
+            tgt_image.save(os.path.join(f'{args.output}_{args.tgt_lang}', f'{count}.jpg'))
 
             # Save metadata
             src_meta[f'{count}.jpg'] = {

@@ -209,3 +209,5 @@ __marimo__/
 generator/images/*
 generator/font/*
 data/*
+*/predictions/*
+*/nohup*

@@ -47,12 +47,11 @@ def main():
     prompt = "Translate the following English sentence into German and explain it in detail:\n{text} <de>"
 
     identifiers = list(data.keys())
-    source_sentences = [data[id]['text'] for id in identifiers]
+    source_sentences = ['\n'.join(data[id]['text']) for id in identifiers]
     translations = forward(model, source_sentences, prompt)
 
     for id, translation in zip(identifiers, translations):
-        data[id]['translation'] = translation
-
+        data[id]['translation'] = translation.split('\n')
     with open(args.output, 'w', encoding='utf-8') as f:
         yaml.dump(data, f, allow_unicode=True)
 
