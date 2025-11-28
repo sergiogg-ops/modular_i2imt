@@ -17,12 +17,17 @@ def parse_args():
 def read_image(image_path):
     return DocumentFile.from_images(image_path)
 
+def horizontal_bbox(box):
+    x_min, y_min, x_max, y_max = box
+    return [[x_min, y_min], [x_max, y_min], [x_max, y_max], [x_min, y_max]]
+
 def parse_doctr(document, img_size=512):
     texts = []
     bboxes = []
     for line in document.pages[0].blocks[0].lines:
         bbox = line.geometry
         bbox = [[float(box[0]*img_size), float(box[1]*img_size)] for box in bbox]
+        bbox = horizontal_bbox([bbox[0][0], bbox[0][1], bbox[1][0], bbox[1][1]])
         text = ''
         for word in line.words:
             text += word.value + ' '
@@ -45,10 +50,9 @@ def main():
         document = read_image(image_path)
         texts, bboxes = forward(predictor, document)
         #combined_text = ' '.join([' '.join(block) for block in texts])
-        combined_bboxes = [bbox for block in bboxes for bbox in block]
         results[basename(image_path)] = {
             "text": texts,
-            "bbox": combined_bboxes
+            "bboxes": bboxes
         }
     with open(args.output, "w") as f:
         yaml.dump(results, f)

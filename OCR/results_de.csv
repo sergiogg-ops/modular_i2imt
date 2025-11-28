@@ -1,0 +1,4 @@
+name,wer,bwer,time,datetime,comment,task,subtask,position,cluster_wer,cluster_bwer
+easyocr,8.5156,6.9918,0,2025-11-26 13:31:30.338305,,ocr,german,1,1,1
+trocr,16.7358,16.5181,0,2025-11-26 13:31:30.399212,,ocr,german,2,2,2
+deepseek,53.0787,53.0735,0,2025-11-26 13:31:30.275762,,ocr,german,3,3,3

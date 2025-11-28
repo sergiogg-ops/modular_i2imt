@@ -1,0 +1,4 @@
+name,iou,time,datetime,comment,task,subtask,position,cluster_iou
+deepseek,0.6601,0,2025-11-26 15:14:19.197347,,t_det,german,1,1
+easyocr,0.6548,0,2025-11-26 15:14:19.917075,,t_det,german,2,2
+trocr,0.5692,0,2025-11-26 15:14:20.604481,,t_det,german,3,3

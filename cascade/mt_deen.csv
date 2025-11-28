@@ -1,0 +1,3 @@
+name,bleu,ter,chrf,time,datetime,comment,task,subtask,position,cluster_bleu,cluster_ter,cluster_chrf
+nllb,35.2687,60.4967,52.9072,0,2025-11-27 09:00:38.978029,,mt,de-en,1,1,1,1
+mt_step,32.7582,63.1670,51.2458,0,2025-11-27 09:00:38.166926,,mt,de-en,2,2,2,2

@@ -24,3 +24,4 @@ max_slope: 0
 min_width: 128
 num_images: 3000
 seed: 42
+y_offset: 4

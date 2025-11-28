@@ -33,7 +33,7 @@ def horizontal_bbox(box):
     x_min, y_min, x_max, y_max = box
     return [[x_min, y_min], [x_max, y_min], [x_max, y_max], [x_min, y_max]]
 
-def forward(model, tokenizer, image_path, output_path):
+def forward(model, tokenizer, image_path):
     prompt = "<image>\n<|grounding|>OCR this image."
 
     with suppress_stdout():
@@ -41,14 +41,18 @@ def forward(model, tokenizer, image_path, output_path):
                     prompt=prompt, 
                     image_file=image_path, 
                     output_path='model_outputs', 
-                    base_size=1024, 
-                    image_size=512, 
-                    crop_mode=True,
+                    base_size=512, 
+                    image_size=1024, 
+                    crop_mode=False,
+                    test_compress=True,
                     eval_mode=True)
+    print(res)
     texts = re.findall(r'<\|ref\|>(.+?)<\|/ref\|>', res)
     #texts = ' '.join(texts)
     bboxes = re.findall(r'<\|det\|>(.+?)<\|/det\|>', res)
-    bboxes = [horizontal_bbox(loads(bbox)[0]) for bbox in bboxes]
+    bboxes = [[n*512/1024 for n in loads(box)[0]] for box in bboxes]
+    #bboxes = [horizontal_bbox(loads(bbox)[0]) for bbox in bboxes]
+    bboxes = [horizontal_bbox(box) for box in bboxes]
     return texts, bboxes
     
 
@@ -61,13 +65,13 @@ def main():
                                       trust_remote_code=True, 
                                       use_safetensors=True)
     model = model.eval()
+    model = model.to(torch.bfloat16)
     if torch.cuda.is_available() and args.use_gpu:
         model = model.cuda()
-    model = model.to(torch.bfloat16)
 
     results = {}
     for image_path in tqdm(args.paths, unit="image"):
-        texts, bboxes = forward(model, tokenizer, image_path, args.output)
+        texts, bboxes = forward(model, tokenizer, image_path)
         results[os.path.basename(image_path)] = {"text": texts, "bboxes": bboxes}
     
     with open(args.output, 'w') as f:

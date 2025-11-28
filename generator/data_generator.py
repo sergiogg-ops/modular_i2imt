@@ -25,6 +25,8 @@ def parse_args():
     parser.add_argument("--num_images", type=int, default=1000, help="Number of images to generate.")
     parser.add_argument("--curation_threshold", type=float, default=0.2, help="Threshold for curation of generated images.")
     parser.add_argument("--seed", type=int, default=42, help="Random seed for reproducibility.")
+    parser.add_argument("--x_offset", type=int, default=0, help="X offset to correct bounding boxes.")
+    parser.add_argument("--y_offset", type=int, default=0, help="Y offset to correct bounding boxes.")
     parser.add_argument("--config", type=str, help="Path to the configuration file in YAML format.")
 
     args = parser.parse_args()
@@ -45,6 +47,8 @@ def parse_args():
         args.num_images = config.get('num_images', args.num_images)
         args.curation_threshold = config.get('curation_threshold', args.curation_threshold)
         args.seed = config.get('seed', args.seed)
+        args.x_offset = config.get('x_offset', args.x_offset)
+        args.y_offset = config.get('y_offset', args.y_offset)
     return args
 
 def load_config(config_path: str):
@@ -131,7 +135,35 @@ class Std_Text(object):
         lines = '\n'.join(lines)
         return lines, widths, splitted_text
 
-def generate_pair(images, src_texts, tgt_texts, fonts, min_height, max_height, min_slope, max_slope, min_width):
+def correct_bbox(bbox, x_offset, y_offset):
+    '''
+    Correct the bounding box coordinates by adding the specified offsets.
+
+    Args:
+        bbox (list): List of bounding box coordinates [[x1, y1], [x2, y2], [x3, y3], [x4, y4]].
+        x_offset (int): Correction to be added to x-coordinates.
+        y_offset (int): Correction to be added to y-coordinates.
+
+    Returns:
+        list: Corrected bounding box coordinates.
+    '''
+    corrected_bbox = []
+    for point in bbox:
+        corrected_point = [float(point[0] + x_offset), float(point[1] + y_offset)]
+        corrected_bbox.append(corrected_point)
+    return corrected_bbox
+
+def generate_pair(images, 
+                  src_texts, 
+                  tgt_texts, 
+                  fonts, 
+                  min_height, 
+                  max_height, 
+                  min_slope, 
+                  max_slope, 
+                  min_width,
+                  x_offset=0, 
+                  y_offset=0):
     '''
     Generate a pair (source and target) of images with text.
 
@@ -172,6 +204,9 @@ def generate_pair(images, src_texts, tgt_texts, fonts, min_height, max_height, m
     drawer = Std_Text(font, height)
     src_image, src_bboxes, src_lines = drawer.draw_text(src_text, bg_image.copy(), bbox, slope)
     tgt_image, tgt_bboxes, tgt_lines = drawer.draw_text(tgt_text, bg_image.copy(), bbox, slope)
+    # Correct bboxes
+    src_bboxes = [correct_bbox(bbox, x_offset, y_offset) for bbox in src_bboxes]
+    tgt_bboxes = [correct_bbox(bbox, x_offset, y_offset) for bbox in tgt_bboxes]
     return src_image, tgt_image, src_lines, tgt_lines, src_bboxes, tgt_bboxes
 
 def verify(reader, img, text, threshold):
@@ -253,11 +288,11 @@ def main():
             # Save metadata
             src_meta[f'{count}.jpg'] = {
                 'text': src_text,
-                'bboxes': [bbox.tolist() for bbox in src_bboxes]
+                'bboxes': src_bboxes
             }
             tgt_meta[f'{count}.jpg'] = {
                 'text': tgt_text,
-                'bboxes': [bbox.tolist() for bbox in tgt_bboxes]
+                'bboxes': tgt_bboxes
             }
 
             count += 1

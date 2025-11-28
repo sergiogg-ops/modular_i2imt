@@ -1,0 +1,5 @@
+name,bleu,ter,chrf,time,datetime,comment,task,subtask,position,cluster_bleu,cluster_ter,cluster_chrf
+nllb,27.8107,69.5242,50.6536,0,2025-11-26 13:36:11.969955,,mt,en-de,1,1,1,1
+gemma,21.3011,74.6139,45.7843,0,2025-11-26 13:36:07.439346,,mt,en-de,2,2,2,2
+seed,1.6086,719.8715,19.4153,0,2025-11-26 13:36:14.484095,,mt,en-de,3,3,3,3
+madlad,0.4023,410.5836,2.3811,0,2025-11-26 13:36:11.066533,,mt,en-de,4,4,4,4

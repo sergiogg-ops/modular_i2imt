@@ -34,7 +34,7 @@ def main():
         text = forward(reader, image)
         results[basename(image_path)] = {
             "text": text[1],
-            "bbox": text[0]
+            "bboxes": text[0]
         }
     with open(args.output, "w") as f:
         yaml.dump(results, f)

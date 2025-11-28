@@ -211,3 +211,6 @@ generator/font/*
 data/*
 */predictions/*
 */nohup*
+cascade/*/*
+img_gen/cv_anytext_text_generation_editing/*
+OCR/model_outputs/*

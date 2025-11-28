@@ -2,11 +2,13 @@ from modelscope.pipelines import pipeline
 from argparse import ArgumentParser
 from tqdm import tqdm
 from shapely.geometry import Polygon
+from contextlib import contextmanager
 import os
 import torch
 import yaml
 import numpy as np
 import cv2
+import sys
 
 READER, MT_MODEL, MT_TOKENIZER, IMG_MODEL = None, None, None, None
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -109,11 +111,39 @@ def draw_mask(bboxes, image_path, save_path, margin=2):
     # num_labels, labels = cv2.connectedComponents(pos_bin.astype("uint8"))
     # print("positions:", num_labels - 1)  # background excluded
 
+@contextmanager
+def suppress_stdout():
+    with open(os.devnull, "w") as devnull:
+        old_stdout = sys.stdout
+        sys.stdout = devnull
+        try:
+            yield
+        finally:
+            sys.stdout = old_stdout
+
+def split_text(text, n):
+    ''' 
+    Splits the text in parts of the same size.
+
+    Args:
+        text: The text to split.
+        n: Number of parts to split the text into.
+    Returns:
+        A list of text parts.
+    '''
+    words = text.split()
+    avg = len(words) / float(n)
+    out = []
+    last = 0.0
+    while last < len(words):
+        out.append(" ".join(words[int(last):int(last + avg)]))
+        last += avg
+    return out
 
 def forward(bboxes, texts, file, margin=2):
-
     draw_mask(bboxes, file, MASK_URL, margin=margin)
     prompt = 'A poster that reads:'
+    texts = split_text(" ".join(texts), len(bboxes))
     for i, t in enumerate(texts):
         prompt += f'\n Line {i+1}: "{t}"'
     input_data = {
@@ -122,7 +152,8 @@ def forward(bboxes, texts, file, margin=2):
         "draw_pos": MASK_URL,
         "ori_image": file
     }
-    results, rtn_code, rtn_warning, _ = IMG_MODEL(input_data, 
+    with suppress_stdout():
+        results, rtn_code, rtn_warning, _ = IMG_MODEL(input_data, 
                                                     mode='text-editing',
                                                     ddim_steps=20,
                                                     image_count=2,
