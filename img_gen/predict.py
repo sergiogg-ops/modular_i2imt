@@ -29,6 +29,20 @@ def parse_args():
     parser.add_argument("--margin", type=int, default=2, help="Margin to add when removing bbox overlaps.")
     return parser.parse_args()
 
+def normalize_bbox(poly):
+    """
+    Normalize a polygon to a minimal horizontal rectangle coordinates.
+    Args:
+        poly: a Polygon object
+    Returns:
+        x_min, y_min, x_max, y_max
+    """
+    x_min = min([point[0] for point in poly.exterior.coords])
+    y_min = min([point[1] for point in poly.exterior.coords])
+    x_max = max([point[0] for point in poly.exterior.coords])
+    y_max = max([point[1] for point in poly.exterior.coords])
+    return x_min, y_min, x_max, y_max
+
 def difference(poly1, poly2, margin=0):
     """
     Compute the geometric difference between two polygons. They must be axis-aligned rectangles.
@@ -38,20 +52,20 @@ def difference(poly1, poly2, margin=0):
     Returns:
         A shapely Polygon representing the area of poly1 minus the area of poly2.
     """
-    x1_min, y1_min, x1_max, y1_max = poly1.bounds
-    x2_min, y2_min, x2_max, y2_max = poly2.bounds
+    x1_min, y1_min, x1_max, y1_max = normalize_bbox(poly1)
+    x2_min, y2_min, x2_max, y2_max = normalize_bbox(poly2)
     
-    if y1_max >= y2_min and y1_min < y2_max:
-        y1_max = y2_min - margin
-    elif y1_min <= y2_max and y1_max > y2_min:
-        y1_min = y2_max + margin
-    poly1 = Polygon([(x1_min, y1_min), (x1_max, y1_min), (x1_max, y1_max), (x1_min, y1_max)])
-    if not poly1.intersects(poly2):
-        return poly1
-    if x1_max >= x2_min and x1_min < x2_max:
-        x1_max = x2_min - margin
-    elif x1_min <= x2_max and x1_max > x2_min:
-        x1_min = x2_max + margin
+    if y1_max > y2_min and y1_min < y2_max:
+        if y1_min <= y2_min:
+            y1_max = y2_min - margin
+        else:
+            y1_min = y2_max + margin
+    if (y1_max > y2_min and y1_min < y2_max) and  \
+        (x1_max > x2_min and x1_min < x2_max):
+        if x1_min <= x2_min:
+            x1_max = x2_min - margin
+        else:
+            x1_min = x2_max + margin
     return Polygon([(x1_min, y1_min), (x1_max, y1_min), (x1_max, y1_max), (x1_min, y1_max)])
 
 def remove_bbox_overlaps(bboxes, margin=0):
@@ -80,8 +94,8 @@ def remove_bbox_overlaps(bboxes, margin=0):
             if remaining.is_empty:
                 break
             #remaining = remaining.difference(prev_poly)
-            if remaining.intersects(prev_poly):
-                remaining = difference(remaining, prev_poly, margin)
+            # if remaining.intersects(prev_poly):
+            remaining = difference(remaining, prev_poly, margin)
         result_polygons.append(remaining)
     
     # Convert Shapely polygons back to coordinate format
@@ -205,8 +219,8 @@ def main():
         except Exception as e:
             print(f"Error processing {file}: {e}")
             continue
-    os.remove(MASK_URL)
-    name = args.output if args.output[-1] != '/' else args.output[:-1]
+    if os.path.exists(MASK_URL):
+        os.remove(MASK_URL)
 
 if __name__ == "__main__":
     main()
