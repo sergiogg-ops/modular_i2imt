@@ -46,7 +46,6 @@ def forward(model, tokenizer, image_path):
                     crop_mode=False,
                     test_compress=True,
                     eval_mode=True)
-    print(res)
     texts = re.findall(r'<\|ref\|>(.+?)<\|/ref\|>', res)
     #texts = ' '.join(texts)
     bboxes = re.findall(r'<\|det\|>(.+?)<\|/det\|>', res)
@@ -71,8 +70,11 @@ def main():
 
     results = {}
     for image_path in tqdm(args.paths, unit="image"):
-        texts, bboxes = forward(model, tokenizer, image_path)
-        results[os.path.basename(image_path)] = {"text": texts, "bboxes": bboxes}
+        try:
+            texts, bboxes = forward(model, tokenizer, image_path)
+            results[os.path.basename(image_path)] = {"text": texts, "bboxes": bboxes}
+        except Exception as e:
+            print(f"Error processing {image_path}: {e}")
     
     with open(args.output, 'w') as f:
         yaml.dump(results, f)

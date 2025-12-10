@@ -1,0 +1,3 @@
+name,bleu,ter,chrf,time,datetime,comment,task,subtask,position,cluster_bleu,cluster_ter,cluster_chrf
+cascade,0.7523,113.0818,12.3453,0,2025-12-10 09:04:30.288522,,mt,en-de,1,1,1,1
+translatotron,0.0040,104.6491,1.9167,0,2025-12-10 09:04:30.771466,,mt,en-de,2,2,2,2

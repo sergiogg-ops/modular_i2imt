@@ -1,0 +1,3 @@
+name,iou,time,datetime,comment,task,subtask,position,cluster_iou
+cascade,0.2437,0,2025-12-10 10:45:13.025858,,t_det,en-de,1,1
+translatotron,0.0183,0,2025-12-10 10:45:13.546943,,t_det,en-de,2,2

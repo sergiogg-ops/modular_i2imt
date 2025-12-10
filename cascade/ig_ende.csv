@@ -1,0 +1,5 @@
+name,ssim,time,datetime,comment,fid,task,subtask,position,cluster_ssim
+gen_step_3,0.4789,0,2025-12-10 08:36:18.585075,,113.2728,img,en-de,1,1
+anytext,0.4759,0,2025-12-10 08:26:24.473450,,113.3749,img,en-de,2,1
+translatotron,0.6613,0,2025-12-10 08:42:00.669016,,133.3407,img,en-de,3,2
+gen_step,0.1839,0,2025-12-10 08:31:11.441167,,236.0458,img,en-de,4,3
